@@ -103,6 +103,7 @@ const DefaultPartialEvaluatorOptions = Object.freeze({
   useWorkerFetch: true,
   cMapUrl: null,
   cMapPacked: true,
+  cidToGidMapUrl: null,
   iccUrl: null,
   standardFontDataUrl: null,
   wasmUrl: null,
