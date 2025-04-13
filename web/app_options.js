@@ -366,6 +366,17 @@ const defaultOptions = {
           : "../web/cmaps/",
     kind: OptionKind.API,
   },
+  cidToGidMapUrl: {
+    /** @type {string} */
+    value:
+      // eslint-disable-next-line no-nested-ternary
+      typeof PDFJSDev === "undefined"
+        ? "../external/cid_to_gid_maps/"
+        : PDFJSDev.test("MOZCENTRAL")
+          ? "resource://pdf.js/web/cid_to_gid_maps/"
+          : "../web/cid_to_gid_maps/",
+    kind: OptionKind.API,
+  },
   disableAutoFetch: {
     /** @type {boolean} */
     value: false,

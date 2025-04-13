@@ -122,7 +122,9 @@ const RENDERING_CANCELLED_TIMEOUT = 100; // ms
  *   located. Include the trailing slash.
  * @property {boolean} [cMapPacked] - Specifies if the Adobe CMaps are binary
  *   packed or not. The default value is `true`.
- * @property {Object} [CMapReaderFactory] - The factory that will be used when
+ * @property {string} [cidToGidMapUrl] - The URL where the standard fonts
+ *  binary CidToGid maps are located. Include the trailing slash.
+  * @property {Object} [CMapReaderFactory] - The factory that will be used when
  *   reading built-in CMap files.
  *   The default value is {DOMCMapReaderFactory}.
  * @property {string} [iccUrl] - The URL where the predefined ICC profiles are
@@ -266,6 +268,7 @@ function getDocument(src = {}) {
       : null;
   const cMapUrl = getFactoryUrlProp(src.cMapUrl);
   const cMapPacked = src.cMapPacked !== false;
+  const cidToGidMapUrl = getFactoryUrlProp(src.cidToGidMapUrl);
   const CMapReaderFactory =
     src.CMapReaderFactory ||
     (typeof PDFJSDev !== "undefined" && PDFJSDev.test("GENERIC") && isNodeJS
@@ -347,6 +350,7 @@ function getDocument(src = {}) {
           standardFontDataUrl &&
           wasmUrl &&
           isValidFetchUrl(cMapUrl, document.baseURI) &&
+          isValidFetchUrl(cidToGidMapUrl, document.baseURI) &&
           isValidFetchUrl(standardFontDataUrl, document.baseURI) &&
           isValidFetchUrl(wasmUrl, document.baseURI)
         );
@@ -421,6 +425,7 @@ function getDocument(src = {}) {
       useWasm,
       useWorkerFetch,
       cMapUrl,
+      cidToGidMapUrl,
       iccUrl,
       standardFontDataUrl,
       wasmUrl,

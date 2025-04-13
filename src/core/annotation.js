@@ -70,6 +70,7 @@ import { JpegStream } from "./jpeg_stream.js";
 import { ObjectLoader } from "./object_loader.js";
 import { OperatorList } from "./operator_list.js";
 import { XFAFactory } from "./xfa/factory.js";
+import { embedTrueTypeFont } from "./truetype_font_embedder.js";
 
 class AnnotationFactory {
   static createGlobals(pdfManager) {
@@ -357,15 +358,23 @@ class AnnotationFactory {
       switch (annotation.annotationType) {
         case AnnotationEditorType.FREETEXT:
           if (!baseFontRef) {
-            const baseFont = new Dict(xref);
-            baseFont.set("BaseFont", Name.get("Helvetica"));
-            baseFont.set("Type", Name.get("Font"));
-            baseFont.set("Subtype", Name.get("Type1"));
-            baseFont.set("Encoding", Name.get("WinAnsiEncoding"));
-            baseFontRef = xref.getNewTemporaryRef();
-            changes.put(baseFontRef, {
-              data: baseFont,
-            });
+            const fontName = "LiberationSans-Regular";
+            baseFontRef = await embedTrueTypeFont(
+              fontName,
+              evaluator,
+              xref,
+              changes
+            );
+
+            // const baseFont = new Dict(xref);
+            // baseFont.set("BaseFont", Name.get("LiberationSans-Regular"));
+            // baseFont.set("Type", Name.get("Font"));
+            // baseFont.set("Subtype", Name.get("TrueType"));
+            // baseFont.set("Encoding", Name.get("Identity-H"));
+            // baseFontRef = xref.getNewTemporaryRef();
+            // changes.put(baseFontRef, {
+            //   data: baseFont,
+            // });
           }
           promises.push(
             FreeTextAnnotation.createNewAnnotation(xref, annotation, changes, {
@@ -3930,6 +3939,7 @@ class FreeTextAnnotation extends MarkupAnnotation {
   static createNewDict(annotation, xref, { apRef, ap }) {
     const { color, fontSize, oldAnnotation, rect, rotation, user, value } =
       annotation;
+debugger;
     const freetext = oldAnnotation || new Dict(xref);
     freetext.set("Type", Name.get("Annot"));
     freetext.set("Subtype", Name.get("FreeText"));
@@ -3942,7 +3952,7 @@ class FreeTextAnnotation extends MarkupAnnotation {
       freetext.set("CreationDate", `D:${getModificationDate()}`);
     }
     freetext.set("Rect", rect);
-    const da = `/Helv ${fontSize} Tf ${getPdfColor(color, /* isFill */ true)}`;
+    const da = `/LiberationSans-Regular ${fontSize} Tf ${getPdfColor(color, /* isFill */ true)}`;
     freetext.set("DA", da);
     freetext.set("Contents", stringToAsciiOrUTF16BE(value));
     freetext.set("F", 4);
@@ -3972,25 +3982,21 @@ class FreeTextAnnotation extends MarkupAnnotation {
     const { color, fontSize, rect, rotation, value } = annotation;
 
     const resources = new Dict(xref);
-    const font = new Dict(xref);
+    const fonts = new Dict(xref);
 
-    if (baseFontRef) {
-      font.set("Helv", baseFontRef);
-    } else {
-      const baseFont = new Dict(xref);
-      baseFont.set("BaseFont", Name.get("Helvetica"));
-      baseFont.set("Type", Name.get("Font"));
-      baseFont.set("Subtype", Name.get("Type1"));
-      baseFont.set("Encoding", Name.get("WinAnsiEncoding"));
-      font.set("Helv", baseFont);
+    if (!baseFontRef) {
+      throw new Error("baseFontRef is required");
     }
-    resources.set("Font", font);
 
-    const helv = await WidgetAnnotation._getFontData(
+    const fontName = xref.fetch(baseFontRef).get("BaseFont").name;
+    fonts.set(fontName, baseFontRef);
+    resources.set("Font", fonts);
+
+    const font = await WidgetAnnotation._getFontData(
       evaluator,
       task,
       {
-        fontName: "Helv",
+        fontName,
         fontSize,
       },
       resources
@@ -4008,20 +4014,32 @@ class FreeTextAnnotation extends MarkupAnnotation {
     const scale = fontSize / 1000;
     let totalWidth = -Infinity;
     const encodedLines = [];
-    for (let line of lines) {
-      const encoded = helv.encodeString(line);
+    for (const line of lines) {
+      let encoded = font.encodeString(line);
+
       if (encoded.length > 1) {
         // The font doesn't contain all the chars.
-        return null;
+        throw new Error("Text annotation encoding failed");
       }
-      line = encoded.join("");
-      encodedLines.push(line);
+      encoded = encoded.join("");
+      // console.debug("encoded", encoded);
+
+      // line = encoded;
+
       let lineWidth = 0;
-      const glyphs = helv.charsToGlyphs(line);
+      const glyphs = font.charsToGlyphs(line);
+      // console.debug("glyphs", glyphs);
       for (const glyph of glyphs) {
         lineWidth += glyph.width * scale;
       }
       totalWidth = Math.max(totalWidth, lineWidth);
+
+      const reencoded = glyphs
+        .map(g => g.unicode.codePointAt(0).toString(16).padStart(4, "0"))
+        .join("");
+
+      encodedLines.push(reencoded);
+      // console.debug("reencoded", reencoded);
     }
 
     let hscale = 1;
@@ -4067,16 +4085,14 @@ class FreeTextAnnotation extends MarkupAnnotation {
       `${clipBox.join(" ")} re W n`,
       `BT`,
       `${getPdfColor(color, /* isFill */ true)}`,
-      `0 Tc /Helv ${numberToString(newFontSize)} Tf`,
+      `0 Tc /${fontName} ${numberToString(newFontSize)} Tf`,
     ];
 
-    buffer.push(
-      `${firstPoint.join(" ")} Td (${escapeString(encodedLines[0])}) Tj`
-    );
+    buffer.push(`${firstPoint.join(" ")} Td <${encodedLines[0]}> Tj`);
     const vShift = numberToString(lineHeight);
     for (let i = 1, ii = encodedLines.length; i < ii; i++) {
       const line = encodedLines[i];
-      buffer.push(`0 -${vShift} Td (${escapeString(line)}) Tj`);
+      buffer.push(`0 -${vShift} Td <${line}> Tj`);
     }
     buffer.push("ET", "Q");
     const appearance = buffer.join("\n");

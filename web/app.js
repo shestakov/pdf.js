@@ -1097,6 +1097,8 @@ const PDFViewerApplication = {
     const loadingTask = getDocument({
       ...apiParams,
       ...args,
+      useSystemFonts: false,
+      cidToGidMapUrl: "/build/",
     });
     this.pdfLoadingTask = loadingTask;
 

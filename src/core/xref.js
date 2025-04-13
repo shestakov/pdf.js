@@ -92,6 +92,23 @@ class XRef {
     this._persistentRefsCache = null;
   }
 
+  putTemporaryRefToCache(ref, data) {
+    const { num } = ref;
+
+    if (!(data instanceof Dict) && !(data instanceof BaseStream)) {
+      throw new FormatError(
+        "Only Dict or BaseStream objects can be stored in xref as temporary references"
+      );
+    }
+
+    const entry = {
+      offset: -1, // NOTE: this only to pass the check in `fetch`
+    };
+
+    this.entries[num] = entry;
+    this._cacheMap.set(num, data);
+  }
+
   setStartXRef(startXRef) {
     // Store the starting positions of xref tables as we process them
     // so we can recover from missing data errors
