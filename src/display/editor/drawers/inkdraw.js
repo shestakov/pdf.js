@@ -80,11 +80,13 @@ class InkDrawOutliner {
     return this.#points.length <= 10;
   }
 
-  add(x, y) {
+  add(x, y, lockX = false, lockY = false) {
     // The point is in canvas coordinates which means that there is no rotation.
     // It's the same as parent coordinates.
     [x, y] = this.#normalizePoint(x, y);
     const [x1, y1, x2, y2] = this.#last.subarray(2, 6);
+    x = lockX ? x2 : x;
+    y = lockY ? y2 : y;
     const diffX = x - x2;
     const diffY = y - y2;
     const d = Math.hypot(this.#parentWidth * diffX, this.#parentHeight * diffY);
@@ -123,8 +125,8 @@ class InkDrawOutliner {
     };
   }
 
-  end(x, y) {
-    const change = this.add(x, y);
+  end(x, y, lockX = false, lockY = false) {
+    const change = this.add(x, y, lockX, lockY);
     if (change) {
       return change;
     }
