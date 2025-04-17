@@ -804,7 +804,7 @@ class DrawingEditor extends AnnotationEditor {
     if (!DrawingEditor.#currentDraw) {
       return;
     }
-    const { offsetX, offsetY, pointerId } = event;
+    const { offsetX, offsetY, pointerId, ctrlKey, shiftKey } = event;
 
     if (DrawingEditor.#currentPointerId !== pointerId) {
       return;
@@ -816,7 +816,7 @@ class DrawingEditor extends AnnotationEditor {
     }
     this._currentParent.drawLayer.updateProperties(
       this._currentDrawId,
-      DrawingEditor.#currentDraw.add(offsetX, offsetY)
+      DrawingEditor.#currentDraw.add(offsetX, offsetY, shiftKey, ctrlKey)
     );
     // We track the timestamp to know if the touchmove event is used to draw.
     DrawingEditor.#currentMoveTimestamp = event.timeStamp;
@@ -853,7 +853,12 @@ class DrawingEditor extends AnnotationEditor {
     if (event?.target === parent.div) {
       parent.drawLayer.updateProperties(
         this._currentDrawId,
-        DrawingEditor.#currentDraw.end(event.offsetX, event.offsetY)
+        DrawingEditor.#currentDraw.end(
+          event.offsetX,
+          event.offsetY,
+          event.shiftKey,
+          event.ctrlKey
+        )
       );
     }
     if (this.supportMultipleDrawings) {
