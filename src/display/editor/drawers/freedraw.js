@@ -88,13 +88,17 @@ class FreeDrawOutliner {
     ];
   }
 
-  add({ x, y }) {
+  add({ x, y, ctrlKey, shiftKey }) {
+    let [x1, y1, x2, y2] = this.#last.subarray(8, 12);
+    const lockX = shiftKey;
+    const lockY = ctrlKey;
+    x = lockX ? x2 : x;
+    y = lockY ? y2 : y;
+    const diffX = x - x2;
+    const diffY = y - y2;
     this.#lastX = x;
     this.#lastY = y;
     const [layerX, layerY, layerWidth, layerHeight] = this.#box;
-    let [x1, y1, x2, y2] = this.#last.subarray(8, 12);
-    const diffX = x - x2;
-    const diffY = y - y2;
     const d = Math.hypot(diffX, diffY);
     if (d < this.#min) {
       // The idea is to avoid garbage points around the last point.
