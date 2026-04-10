@@ -372,23 +372,12 @@ class AnnotationFactory {
       switch (annotation.annotationType) {
         case AnnotationEditorType.FREETEXT:
           if (!baseFontRef) {
-            const fontName = "LiberationSans-Regular";
             baseFontRef = await embedTrueTypeFont(
-              fontName,
+              "LiberationSans-Regular",
               evaluator,
               xref,
               changes
             );
-
-            // const baseFont = new Dict(xref);
-            // baseFont.set("BaseFont", Name.get("LiberationSans-Regular"));
-            // baseFont.set("Type", Name.get("Font"));
-            // baseFont.set("Subtype", Name.get("TrueType"));
-            // baseFont.set("Encoding", Name.get("Identity-H"));
-            // baseFontRef = xref.getNewTemporaryRef();
-            // changes.put(baseFontRef, {
-            //   data: baseFont,
-            // });
           }
           promises.push(
             FreeTextAnnotation.createNewAnnotation(xref, annotation, changes, {
@@ -4161,7 +4150,7 @@ class FreeTextAnnotation extends MarkupAnnotation {
       // line = encoded;
 
       let lineWidth = 0;
-      const glyphs = font.charsToGlyphs(line);
+      const glyphs = font.charsToGlyphs(encoded);
       // console.debug("glyphs", glyphs);
       for (const glyph of glyphs) {
         lineWidth += glyph.width * scale;

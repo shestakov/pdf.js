@@ -1,10 +1,10 @@
 import { Dict, Name } from "./primitives.js";
 import { DW, W } from "./LiberationSans-Regular_W.js";
-import { Stream, StringStream } from "./stream.js";
-import { cMap } from "./LiberationSans-Regular_cMap.js";
+import { Stream } from "./stream.js";
+// import { cMap } from "./LiberationSans-Regular_cMap.js";
 import { fetchBinaryData } from "./core_utils.js";
 
-export async function embedTrueTypeFont(fontName, evaluator, xref, changes) {
+async function embedTrueTypeFont(fontName, evaluator, xref, changes) {
   const fontStream = await evaluator.fetchStandardFontData(fontName);
   if (!fontStream) {
     throw new Error(`Failed to fetch font file for ${fontName}`);
@@ -15,6 +15,7 @@ export async function embedTrueTypeFont(fontName, evaluator, xref, changes) {
   fontStream.dict.set("Length1", fontStream.length);
   const fontStreamRef = xref.getNewTemporaryRef();
   changes.put(fontStreamRef, { data: fontStream });
+  xref.putTemporaryRefToCache(fontStreamRef, fontStream);
 
   const fontDescriptor = new Dict(xref);
   fontDescriptor.set("Type", Name.get("FontDescriptor"));
@@ -39,17 +40,17 @@ export async function embedTrueTypeFont(fontName, evaluator, xref, changes) {
   fontDescriptor.set("FontFile2", fontStreamRef);
   const fontDescriptorRef = xref.getNewTemporaryRef();
   changes.put(fontDescriptorRef, { data: fontDescriptor });
+  xref.putTemporaryRefToCache(fontDescriptorRef, fontDescriptor);
 
-  const toUnicodeCMapData = cMap;
-  const toUnicodeStream = new StringStream(toUnicodeCMapData);
-  toUnicodeStream.dict = new Dict(xref);
-  toUnicodeStream.dict.set("Length", toUnicodeCMapData.length);
-  const toUnicodeStreamRef = xref.getNewTemporaryRef();
-  changes.put(toUnicodeStreamRef, { data: toUnicodeStream });
-  xref.putTemporaryRefToCache(toUnicodeStreamRef, toUnicodeStream);
+  // const toUnicodeCMapData = cMap;
+  // const toUnicodeStream = new StringStream(toUnicodeCMapData);
+  // toUnicodeStream.dict = new Dict(xref);
+  // toUnicodeStream.dict.set("Length", toUnicodeCMapData.length);
+  // const toUnicodeStreamRef = xref.getNewTemporaryRef();
+  // changes.put(toUnicodeStreamRef, { data: toUnicodeStream });
+  // xref.putTemporaryRefToCache(toUnicodeStreamRef, toUnicodeStream);
 
   const CIDToGIDMapBinaryData = await fetchBinaryData(
-    // "/App/LiberationSans-Regular_CidToGIDMap.bin"
     `${evaluator.options.cidToGidMapUrl}LiberationSans-Regular_CidToGIDMap.bin`
   );
   const CIDToGIDMapStream = new Stream(CIDToGIDMapBinaryData);
@@ -69,7 +70,7 @@ export async function embedTrueTypeFont(fontName, evaluator, xref, changes) {
   cidFont.set("Subtype", Name.get("CIDFontType2"));
   cidFont.set("BaseFont", Name.get(fontName));
   cidFont.set("Encoding", Name.get("Identity-H"));
-  cidFont.set("CIDToGIDMap", CIDToGIDMapStream); // WARN: for a real TrueType font IT IS NOT "Identity", see GlyphOrder ttx section
+  cidFont.set("CIDToGIDMap", CIDToGIDMapStreamRef); // WARN: for a real TrueType font IT IS NOT "Identity", see GlyphOrder ttx section
   cidFont.set("CIDSystemInfo", cidSystemInfo);
   cidFont.set("FontDescriptor", fontDescriptorRef);
   // NOTE: ToUnicode is set in the composite type0 font
@@ -86,7 +87,7 @@ export async function embedTrueTypeFont(fontName, evaluator, xref, changes) {
   font.set("BaseFont", Name.get(fontName));
   font.set("Encoding", Name.get("Identity-H"));
   font.set("DescendantFonts", [cidFontRef]);
-  font.set("ToUnicode", toUnicodeStreamRef);
+  // font.set("ToUnicode", toUnicodeStreamRef); // NODE: LiberationSans-Regular has identity cMap
 
   const fontRef = xref.getNewTemporaryRef();
   changes.put(fontRef, { data: font });
@@ -95,3 +96,5 @@ export async function embedTrueTypeFont(fontName, evaluator, xref, changes) {
 
   return fontRef;
 }
+
+export { embedTrueTypeFont };

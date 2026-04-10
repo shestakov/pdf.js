@@ -136,9 +136,6 @@ const RENDERING_CANCELLED_TIMEOUT = 100; // ms
  *   packed or not. The default value is `true`.
  * @property {string} [cidToGidMapUrl] - The URL where the standard fonts
  *  binary CidToGid maps are located. Include the trailing slash.
-  * @property {Object} [CMapReaderFactory] - The factory that will be used when
- *   reading built-in CMap files.
- *   The default value is {DOMCMapReaderFactory}.
  * @property {string} [iccUrl] - The URL where the predefined ICC profiles are
  *   located. Include the trailing slash.
  * @property {boolean} [useSystemFonts] - When `true`, fonts that aren't
@@ -281,11 +278,6 @@ function getDocument(src = {}) {
   const cMapUrl = getFactoryUrlProp(src.cMapUrl);
   const cMapPacked = src.cMapPacked !== false;
   const cidToGidMapUrl = getFactoryUrlProp(src.cidToGidMapUrl);
-  const CMapReaderFactory =
-    src.CMapReaderFactory ||
-    (typeof PDFJSDev !== "undefined" && PDFJSDev.test("GENERIC") && isNodeJS
-      ? NodeCMapReaderFactory
-      : DOMCMapReaderFactory);
   const iccUrl = getFactoryUrlProp(src.iccUrl);
   const standardFontDataUrl = getFactoryUrlProp(src.standardFontDataUrl);
   const wasmUrl = getFactoryUrlProp(src.wasmUrl);
