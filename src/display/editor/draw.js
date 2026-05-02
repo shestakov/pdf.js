@@ -892,23 +892,21 @@ class DrawingEditor extends AnnotationEditor {
         scale,
       } = parent;
 
-      const editor = parent.createAndAddNewEditor(
-        { offsetX: 0, offsetY: 0 },
-        false,
-        {
-          drawId: this._currentDrawId,
-          drawOutlines: DrawingEditor.#currentDraw.getOutlines(
-            pageWidth * scale,
-            pageHeight * scale,
-            scale,
-            this._INNER_MARGIN
-          ),
-          drawingOptions: DrawingEditor.#currentDrawingOptions,
-          mustBeCommitted: !isAborted,
-        }
+      const drawId = this._currentDrawId;
+      const drawOutlines = DrawingEditor.#currentDraw.getOutlines(
+        pageWidth * scale,
+        pageHeight * scale,
+        scale,
+        this._INNER_MARGIN
       );
+      const drawingOptions = DrawingEditor.#currentDrawingOptions;
       this._cleanup(true);
-      return editor;
+      return parent.createAndAddNewEditor({ offsetX: 0, offsetY: 0 }, false, {
+        drawId,
+        drawOutlines,
+        drawingOptions,
+        mustBeCommitted: !isAborted,
+      });
     }
 
     parent.drawLayer.remove(this._currentDrawId);

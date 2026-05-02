@@ -81,6 +81,7 @@
   --toolbarButton-editorFreeText-icon: url(images/toolbarButton-editorFreeText.svg);
   --toolbarButton-editorHighlight-icon: url(images/toolbarButton-editorHighlight.svg);
   --toolbarButton-editorInk-icon: url(images/toolbarButton-editorInk.svg);
+  --toolbarButton-editorSquare-icon: url(images/toolbarButton-editorSquare.svg);
   --toolbarButton-editorStamp-icon: url(images/toolbarButton-editorStamp.svg);
   --toolbarButton-editorSignature-icon: url(images/toolbarButton-editorSignature.svg);
   --toolbarButton-menuArrow-icon: url(images/toolbarButton-menuArrow.svg);
@@ -471,6 +472,10 @@ body {
 
 #editorInkButton::before {
   mask-image: var(--toolbarButton-editorInk-icon);
+}
+
+#editorSquareButton::before {
+  mask-image: var(--toolbarButton-editorSquare-icon);
 }
 
 #editorStampButton::before {

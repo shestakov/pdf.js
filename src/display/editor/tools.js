@@ -2561,6 +2561,7 @@ class AnnotationEditorUIManager {
    * Delete the current editor or all.
    */
   delete() {
+debugger;
     this.commitOrRemove();
     const drawingEditor = this.currentLayer?.endDrawingSession(
       /* isAborted = */ true

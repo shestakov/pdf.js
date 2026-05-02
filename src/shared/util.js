@@ -72,6 +72,7 @@ const AnnotationEditorType = {
   DISABLE: -1,
   NONE: 0,
   FREETEXT: 3,
+  SQUARE: 5,
   HIGHLIGHT: 9,
   STAMP: 13,
   INK: 15,
@@ -94,6 +95,9 @@ const AnnotationEditorParamsType = {
   HIGHLIGHT_FREE: 33,
   HIGHLIGHT_SHOW_ALL: 34,
   DRAW_STEP: 41,
+  SQUARE_COLOR: 51,
+  SQUARE_THICKNESS: 52,
+  SQUARE_OPACITY: 53,
 };
 
 // Permission flags from Table 22, Section 7.6.3.2 of the PDF specification.

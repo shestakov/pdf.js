@@ -303,6 +303,9 @@ pdfjs-editor-ink-button =
 pdfjs-editor-color-picker-ink-input =
     .title = Change drawing color
 pdfjs-editor-ink-button-label = Draw
+pdfjs-editor-square-button =
+    .title = Draw rectangle
+pdfjs-editor-square-button-label = Draw rectangle
 pdfjs-editor-stamp-button =
     .title = Add or edit images
 pdfjs-editor-stamp-button-label = Add or edit images
@@ -333,6 +336,9 @@ pdfjs-editor-highlight-editor =
 # “Drawing” is a noun, the string is used on the editor for drawings.
 pdfjs-editor-ink-editor =
     .aria-label = Drawing editor
+# “Square” is a noun, the string is used on the editor for rectangle annotations.
+pdfjs-editor-square-editor =
+    .aria-label = Square editor
 
 # Used when a signature editor is selected/hovered.
 # Variables:
@@ -347,6 +353,8 @@ pdfjs-editor-stamp-editor =
 
 pdfjs-editor-remove-ink-button =
     .title = Remove drawing
+pdfjs-editor-remove-square-button =
+    .title = Remove square
 pdfjs-editor-remove-freetext-button =
     .title = Remove text
 pdfjs-editor-remove-stamp-button =
@@ -364,6 +372,9 @@ pdfjs-editor-free-text-size-input = Size
 pdfjs-editor-ink-color-input = Color
 pdfjs-editor-ink-thickness-input = Thickness
 pdfjs-editor-ink-opacity-input = Opacity
+pdfjs-editor-square-color-input = Color
+pdfjs-editor-square-thickness-input = Thickness
+pdfjs-editor-square-opacity-input = Opacity
 pdfjs-editor-stamp-add-image-button =
     .title = Add image
 pdfjs-editor-stamp-add-image-button-label = Add image
@@ -548,6 +559,7 @@ pdfjs-editor-alt-text-settings-close-button = Close
 pdfjs-editor-highlight-added-alert = Highlight added
 pdfjs-editor-freetext-added-alert = Text added
 pdfjs-editor-ink-added-alert = Drawing added
+pdfjs-editor-square-added-alert = Square added
 pdfjs-editor-stamp-added-alert = Image added
 pdfjs-editor-signature-added-alert = Signature added
 

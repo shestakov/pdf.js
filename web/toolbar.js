@@ -116,6 +116,18 @@ class Toolbar {
         },
       },
       {
+        element: options.editorSquareButton,
+        eventName: "switchannotationeditormode",
+        eventDetails: {
+          get mode() {
+            const { classList } = options.editorSquareButton;
+            return classList.contains("toggled")
+              ? AnnotationEditorType.NONE
+              : AnnotationEditorType.SQUARE;
+          },
+        },
+      },
+      {
         element: options.editorStampButton,
         eventName: "switchannotationeditormode",
         eventDetails: {
@@ -304,6 +316,8 @@ class Toolbar {
       editorHighlightParamsToolbar,
       editorInkButton,
       editorInkParamsToolbar,
+      editorSquareButton,
+      editorSquareParamsToolbar,
       editorStampButton,
       editorStampParamsToolbar,
       editorSignatureButton,
@@ -331,6 +345,11 @@ class Toolbar {
       editorInkParamsToolbar
     );
     toggleExpandedBtn(
+      editorSquareButton,
+      mode === AnnotationEditorType.SQUARE,
+      editorSquareParamsToolbar
+    );
+    toggleExpandedBtn(
       editorStampButton,
       mode === AnnotationEditorType.STAMP,
       editorStampParamsToolbar
@@ -345,6 +364,7 @@ class Toolbar {
       editorFreeTextButton.disabled =
       editorHighlightButton.disabled =
       editorInkButton.disabled =
+      editorSquareButton.disabled =
       editorStampButton.disabled =
       editorSignatureButton.disabled =
         mode === AnnotationEditorType.DISABLE;

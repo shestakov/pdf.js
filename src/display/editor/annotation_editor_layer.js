@@ -36,6 +36,7 @@ import { HighlightEditor } from "./highlight.js";
 import { InkEditor } from "./ink.js";
 import { setLayerDimensions } from "../display_utils.js";
 import { SignatureEditor } from "./signature.js";
+import { SquareEditor } from "./square.js";
 import { StampEditor } from "./stamp.js";
 
 /**
@@ -100,6 +101,7 @@ class AnnotationEditorLayer {
   static #editorTypes = new Map(
     [
       FreeTextEditor,
+      SquareEditor,
       InkEditor,
       StampEditor,
       HighlightEditor,
@@ -176,6 +178,7 @@ class AnnotationEditorLayer {
         this.toggleAnnotationLayerPointerEvents(true);
         this.disableClick();
         return;
+      case AnnotationEditorType.SQUARE:
       case AnnotationEditorType.INK:
         this.disableTextSelection();
         this.togglePointerEvents(true);
@@ -579,6 +582,7 @@ class AnnotationEditorLayer {
    * @param {AnnotationEditor} editor
    */
   add(editor) {
+    debugger;
     if (editor.parent === this && editor.isAttachedToDOM) {
       return;
     }
@@ -836,10 +840,8 @@ class AnnotationEditorLayer {
     }
     this.#hadPointerDown = false;
 
-    if (
-      this.#currentEditorType?.isDrawer &&
-      this.#currentEditorType.supportMultipleDrawings
-    ) {
+    if (this.#currentEditorType?.isDrawer) {
+      debugger;
       return;
     }
 

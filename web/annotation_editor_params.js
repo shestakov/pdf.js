@@ -24,6 +24,9 @@ import { AnnotationEditorParamsType } from "pdfjs-lib";
  * @property {HTMLInputElement} editorInkColor
  * @property {HTMLInputElement} editorInkThickness
  * @property {HTMLInputElement} editorInkOpacity
+ * @property {HTMLInputElement} editorSquareColor
+ * @property {HTMLInputElement} editorSquareThickness
+ * @property {HTMLInputElement} editorSquareOpacity
  * @property {HTMLButtonElement} editorStampAddImage
  * @property {HTMLInputElement} editorFreeHighlightThickness
  * @property {HTMLButtonElement} editorHighlightShowAll
@@ -49,6 +52,9 @@ class AnnotationEditorParams {
     editorInkColor,
     editorInkThickness,
     editorInkOpacity,
+    editorSquareColor,
+    editorSquareThickness,
+    editorSquareOpacity,
     editorStampAddImage,
     editorFreeHighlightThickness,
     editorHighlightShowAll,
@@ -77,6 +83,15 @@ class AnnotationEditorParams {
     });
     editorInkOpacity.addEventListener("input", function () {
       dispatchEvent("INK_OPACITY", this.valueAsNumber);
+    });
+    editorSquareColor.addEventListener("input", function () {
+      dispatchEvent("SQUARE_COLOR", this.value);
+    });
+    editorSquareThickness.addEventListener("input", function () {
+      dispatchEvent("SQUARE_THICKNESS", this.valueAsNumber);
+    });
+    editorSquareOpacity.addEventListener("input", function () {
+      dispatchEvent("SQUARE_OPACITY", this.valueAsNumber);
     });
     editorStampAddImage.addEventListener("click", () => {
       eventBus.dispatch("reporttelemetry", {
@@ -117,6 +132,15 @@ class AnnotationEditorParams {
             break;
           case AnnotationEditorParamsType.INK_OPACITY:
             editorInkOpacity.value = value;
+            break;
+          case AnnotationEditorParamsType.SQUARE_COLOR:
+            editorSquareColor.value = value;
+            break;
+          case AnnotationEditorParamsType.SQUARE_THICKNESS:
+            editorSquareThickness.value = value;
+            break;
+          case AnnotationEditorParamsType.SQUARE_OPACITY:
+            editorSquareOpacity.value = value;
             break;
           case AnnotationEditorParamsType.HIGHLIGHT_COLOR:
             eventBus.dispatch("mainhighlightcolorpickerupdatecolor", {

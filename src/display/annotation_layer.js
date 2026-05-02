@@ -3174,6 +3174,7 @@ class SquareAnnotationElement extends AnnotationElement {
 
   constructor(parameters) {
     super(parameters, { isRenderable: true, ignoreBorder: true });
+    this.annotationEditorType = AnnotationEditorType.SQUARE;
   }
 
   render() {
@@ -3214,7 +3215,29 @@ class SquareAnnotationElement extends AnnotationElement {
       this._createPopup();
     }
 
+    this._editOnDoubleClick();
+
     return this.container;
+  }
+
+  updateEdited(params) {
+    super.updateEdited(params);
+    const { rect } = params;
+    if (rect) {
+      const w = rect[2] - rect[0];
+      const h = rect[3] - rect[1];
+      const bw = this.data.borderStyle.width;
+      const sq = this.#square;
+      if (sq) {
+        sq.setAttribute("width", w - bw);
+        sq.setAttribute("height", h - bw);
+        const svg = sq.parentElement;
+        if (svg) {
+          svg.setAttribute("width", w);
+          svg.setAttribute("height", h);
+        }
+      }
+    }
   }
 
   getElementsToTriggerPopup() {
@@ -4188,5 +4211,6 @@ export {
   FreeTextAnnotationElement,
   HighlightAnnotationElement,
   InkAnnotationElement,
+  SquareAnnotationElement,
   StampAnnotationElement,
 };

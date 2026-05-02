@@ -22,6 +22,7 @@ import {
   getAnnotationSelector,
   getEditors,
   getEditorSelector,
+  getFirstSerialized,
   getRect,
   getSerialized,
   isCanvasMonochrome,
@@ -1273,6 +1274,51 @@ describe("Ink must committed when leaving the tab", () => {
 
         const countAfter = await countStorageEntries(page);
         expect(countAfter).withContext(`In ${browserName}`).toEqual(1);
+      })
+    );
+  });
+});
+
+describe("Ink Editor Thickness round-trip", () => {
+  let pages;
+
+  beforeEach(async () => {
+    pages = await loadAndWait("empty.pdf", ".annotationEditorLayer");
+  });
+
+  afterEach(async () => {
+    await closePages(pages);
+  });
+
+  it("must check that serialized thickness matches the SVG stroke-width", async () => {
+    await Promise.all(
+      pages.map(async ([browserName, page]) => {
+        await switchToInk(page);
+
+        const rect = await page.$eval(".annotationEditorLayer", el => el.getBoundingClientRect().toJSON()
+        );
+
+        const x = rect.x + 20;
+        const y = rect.y + 20;
+        await drawLine(page, x, y, x + 50, y + 50);
+        // Commit the ink stroke so it appears in annotation storage.
+        await page.keyboard.press("Escape");
+        await waitForSerialized(page, 1);
+
+        const { thickness: serializedThickness } =
+          await getFirstSerialized(page);
+
+        const svgStrokeWidth = await page.$eval(".canvasWrapper svg.draw", el =>
+          parseFloat(el.getAttribute("stroke-width"))
+        );
+
+        const realScale = await page.evaluate(
+          () => window.PDFViewerApplication.pdfViewer.currentScale * (96 / 72)
+        );
+
+        expect(svgStrokeWidth)
+          .withContext(`In ${browserName}`)
+          .toBeCloseTo(serializedThickness * realScale, 1);
       })
     );
   });

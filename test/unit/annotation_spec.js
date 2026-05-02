@@ -4696,6 +4696,115 @@ describe("annotation", function () {
     });
   });
 
+  describe("SquareAnnotation", function () {
+    it("should handle a basic square annotation", async function () {
+      const squareDict = new Dict();
+      squareDict.set("Type", Name.get("Annot"));
+      squareDict.set("Subtype", Name.get("Square"));
+      squareDict.set("Rect", [10, 20, 110, 120]);
+
+      const squareRef = Ref.get(180, 0);
+      const xref = new XRefMock([{ ref: squareRef, data: squareDict }]);
+
+      const { data } = await AnnotationFactory.create(
+        xref,
+        squareRef,
+        annotationGlobalsMock,
+        idFactoryMock
+      );
+      expect(data.annotationType).toEqual(AnnotationType.SQUARE);
+      expect(data.rect).toEqual([10, 20, 110, 120]);
+    });
+
+    it("should create a new Square annotation", async function () {
+      const xref = (partialEvaluator.xref = new XRefMock());
+      const changes = new RefSetCache();
+      const task = new WorkerTask("test Square creation");
+      await AnnotationFactory.saveNewAnnotations(
+        partialEvaluator,
+        xref,
+        task,
+        [
+          {
+            annotationType: AnnotationEditorType.SQUARE,
+            rect: [12, 34, 56, 78],
+            rotation: 0,
+            thickness: 2,
+            opacity: 1,
+            color: [255, 0, 0],
+          },
+        ],
+        null,
+        changes
+      );
+      const data = await writeChanges(changes, xref);
+
+      const base = data[0].data.replace(/\(D:\d+\)/, "(date)");
+      expect(base).toEqual(
+        "1 0 obj\n" +
+          "<< /Type /Annot /Subtype /Square /CreationDate (date) /Rect [12 34 56 78] /F 4 " +
+          "/Rotate 0 /BS << /W 2>> /C [1 0 0] /CA 1 /AP << /N 2 0 R>>>>\n" +
+          "endobj\n"
+      );
+
+      const appearance = data[1].data;
+      expect(appearance).toEqual(
+        "2 0 obj\n" +
+          "<< /FormType 1 /Subtype /Form /Type /XObject /BBox [12 34 56 78] /Length 25>> stream\n" +
+          "2 w\n" +
+          "1 0 0 RG\n" +
+          "13 35 42 42 re S\n" +
+          "endstream\n" +
+          "endobj\n"
+      );
+    });
+
+    it("should create a new Square annotation with transparency", async function () {
+      const xref = (partialEvaluator.xref = new XRefMock());
+      const changes = new RefSetCache();
+      const task = new WorkerTask("test Square creation with transparency");
+      await AnnotationFactory.saveNewAnnotations(
+        partialEvaluator,
+        xref,
+        task,
+        [
+          {
+            annotationType: AnnotationEditorType.SQUARE,
+            rect: [10, 20, 60, 80],
+            rotation: 0,
+            thickness: 1,
+            opacity: 0.5,
+            color: [0, 0, 255],
+          },
+        ],
+        null,
+        changes
+      );
+      const data = await writeChanges(changes, xref);
+
+      const base = data[0].data.replace(/\(D:\d+\)/, "(date)");
+      expect(base).toEqual(
+        "1 0 obj\n" +
+          "<< /Type /Annot /Subtype /Square /CreationDate (date) /Rect [10 20 60 80] /F 4 " +
+          "/Rotate 0 /BS << /W 1>> /C [0 0 1] /CA 0.5 /AP << /N 2 0 R>>>>\n" +
+          "endobj\n"
+      );
+
+      const appearance = data[1].data;
+      expect(appearance).toEqual(
+        "2 0 obj\n" +
+          "<< /FormType 1 /Subtype /Form /Type /XObject /BBox [10 20 60 80] /Length 51 /Resources " +
+          "<< /ExtGState << /R0 << /CA 0.5 /Type /ExtGState>>>>>>>> stream\n" +
+          "1 w\n" +
+          "0 0 1 RG\n" +
+          "/R0 gs\n" +
+          "10.5 20.5 49 59 re S\n" +
+          "endstream\n" +
+          "endobj\n"
+      );
+    });
+  });
+
   describe("HighlightAnnotation", function () {
     it("should set quadpoints to null if not defined", async function () {
       const highlightDict = new Dict();

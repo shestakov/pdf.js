@@ -68,12 +68,12 @@ import { BaseStream } from "./base_stream.js";
 import { bidi } from "./bidi.js";
 import { Catalog } from "./catalog.js";
 import { ColorSpaceUtils } from "./colorspace_utils.js";
+import { embedTrueTypeFont } from "./truetype_font_embedder.js";
 import { FileSpec } from "./file_spec.js";
 import { JpegStream } from "./jpeg_stream.js";
 import { ObjectLoader } from "./object_loader.js";
 import { OperatorList } from "./operator_list.js";
 import { XFAFactory } from "./xfa/factory.js";
-import { embedTrueTypeFont } from "./truetype_font_embedder.js";
 
 class AnnotationFactory {
   static createGlobals(pdfManager) {
@@ -403,6 +403,11 @@ class AnnotationFactory {
             InkAnnotation.createNewAnnotation(xref, annotation, changes)
           );
           break;
+        case AnnotationEditorType.SQUARE:
+          promises.push(
+            SquareAnnotation.createNewAnnotation(xref, annotation, changes)
+          );
+          break;
         case AnnotationEditorType.STAMP:
           const image = isOffscreenCanvasSupported
             ? await imagePromises?.get(annotation.bitmapId)
@@ -501,6 +506,18 @@ class AnnotationFactory {
         case AnnotationEditorType.INK:
           promises.push(
             InkAnnotation.createNewPrintAnnotation(
+              annotationGlobals,
+              xref,
+              annotation,
+              {
+                evaluatorOptions: options,
+              }
+            )
+          );
+          break;
+        case AnnotationEditorType.SQUARE:
+          promises.push(
+            SquareAnnotation.createNewPrintAnnotation(
               annotationGlobals,
               xref,
               annotation,
@@ -4309,6 +4326,8 @@ class SquareAnnotation extends MarkupAnnotation {
     const { dict, xref } = params;
     this.data.hasOwnCanvas = this.data.noRotate;
     this.data.noHTML = false;
+    this.data.isEditable = !this.data.noHTML;
+    this.data.opacity = dict.get("CA") || 1;
 
     if (!this.appearance) {
       // The default stroke color is black.
@@ -4347,6 +4366,107 @@ class SquareAnnotation extends MarkupAnnotation {
         },
       });
     }
+  }
+
+  static createNewDict(annotation, xref, { apRef, ap }) {
+    const {
+      oldAnnotation,
+      color,
+      date,
+      opacity,
+      rect,
+      rotation,
+      thickness,
+      user,
+    } = annotation;
+    const sq = oldAnnotation || new Dict(xref);
+    sq.setIfNotExists("Type", Name.get("Annot"));
+    sq.setIfNotExists("Subtype", Name.get("Square"));
+    sq.set(
+      oldAnnotation ? "M" : "CreationDate",
+      `D:${getModificationDate(date)}`
+    );
+    const bw = thickness || 0;
+    sq.setIfArray("Rect", [
+      rect[0] - bw,
+      rect[1] - bw,
+      rect[2] + bw,
+      rect[3] + bw,
+    ]);
+    sq.setIfNotExists("F", 4);
+    sq.setIfNumber("Rotate", rotation);
+    sq.setIfDefined("T", stringToAsciiOrUTF16BE(user));
+
+    if (thickness > 0) {
+      const bs = new Dict(xref);
+      sq.set("BS", bs);
+      bs.set("W", thickness);
+    }
+
+    sq.setIfArray("C", getPdfColorArray(color));
+    sq.setIfNumber("CA", opacity);
+
+    if (ap || apRef) {
+      const n = new Dict(xref);
+      sq.set("AP", n);
+      n.set("N", apRef || ap);
+    }
+
+    return sq;
+  }
+
+  static async createNewAppearanceStream(annotation, xref, _params) {
+    const { color, rect, thickness, opacity } = annotation;
+    if (!color) {
+      return null;
+    }
+
+    const [x1, y1, x2, y2] = rect;
+    const bw = thickness || 1;
+    // Path expanded outward by half the stroke so the entire border lies
+    // outside the user-drawn rectangle.
+    const rx = x1 - bw / 2;
+    const ry = y1 - bw / 2;
+    const rw = x2 - x1 + bw;
+    const rh = y2 - y1 + bw;
+
+    const appearanceBuffer = [
+      `${bw} w`,
+      `${getPdfColor(color, /* isFill */ false)}`,
+    ];
+
+    if (opacity !== 1) {
+      appearanceBuffer.push("/R0 gs");
+    }
+
+    appearanceBuffer.push(
+      `${numberToString(rx)} ${numberToString(ry)} ${numberToString(rw)} ${numberToString(rh)} re S`
+    );
+
+    const appearance = appearanceBuffer.join("\n");
+
+    const appearanceStreamDict = new Dict(xref);
+    appearanceStreamDict.set("FormType", 1);
+    appearanceStreamDict.setIfName("Subtype", "Form");
+    appearanceStreamDict.setIfName("Type", "XObject");
+    appearanceStreamDict.set("BBox", [x1 - bw, y1 - bw, x2 + bw, y2 + bw]);
+    appearanceStreamDict.set("Length", appearance.length);
+
+    if (opacity !== 1) {
+      const resources = new Dict(xref);
+      const extGState = new Dict(xref);
+      const r0 = new Dict(xref);
+      r0.set("CA", opacity);
+      r0.setIfName("Type", "ExtGState");
+      extGState.set("R0", r0);
+      resources.set("ExtGState", extGState);
+      appearanceStreamDict.set("Resources", resources);
+    }
+
+    const ap = new StringStream(appearance);
+    ap.dict = appearanceStreamDict;
+
+    return ap;
   }
 }
 

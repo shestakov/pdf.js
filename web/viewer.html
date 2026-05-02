@@ -573,6 +573,37 @@ See https://github.com/adobe-type-tools/cmap-resources
                       </div>
                     </div>
                   </div>
+                  <div id="editorSquare" class="toolbarButtonWithContainer">
+                    <button
+                      id="editorSquareButton"
+                      class="toolbarButton"
+                      type="button"
+                      disabled="disabled"
+                      aria-expanded="false"
+                      aria-haspopup="true"
+                      aria-controls="editorSquareParamsToolbar"
+                      tabindex="0"
+                      data-l10n-id="pdfjs-editor-square-button"
+                    >
+                      <span data-l10n-id="pdfjs-editor-square-button-label"></span>
+                    </button>
+                    <div class="editorParamsToolbar hidden doorHangerRight" id="editorSquareParamsToolbar">
+                      <div class="editorParamsToolbarContainer">
+                        <div class="editorParamsSetter">
+                          <label for="editorSquareColor" class="editorParamsLabel" data-l10n-id="pdfjs-editor-square-color-input"></label>
+                          <input type="color" id="editorSquareColor" class="editorParamsColor" tabindex="0" />
+                        </div>
+                        <div class="editorParamsSetter">
+                          <label for="editorSquareThickness" class="editorParamsLabel" data-l10n-id="pdfjs-editor-square-thickness-input"></label>
+                          <input type="range" id="editorSquareThickness" class="editorParamsSlider" value="1" min="1" max="20" step="1" tabindex="0" />
+                        </div>
+                        <div class="editorParamsSetter">
+                          <label for="editorSquareOpacity" class="editorParamsLabel" data-l10n-id="pdfjs-editor-square-opacity-input"></label>
+                          <input type="range" id="editorSquareOpacity" class="editorParamsSlider" value="1" min="0.05" max="1" step="0.05" tabindex="0" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <div id="editorStamp" class="toolbarButtonWithContainer">
                     <button
                       id="editorStampButton"
