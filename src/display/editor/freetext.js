@@ -793,6 +793,7 @@ class FreeTextEditor extends AnnotationEditor {
           contentsObj,
           creationDate,
           modificationDate,
+          annotationId,
         },
         textContent,
         textPosition,
@@ -823,6 +824,7 @@ class FreeTextEditor extends AnnotationEditor {
         richText,
         creationDate,
         modificationDate,
+        annotationId: annotationId ?? null,
       };
     }
     const editor = await super.deserialize(data, parent, uiManager);
@@ -874,7 +876,8 @@ class FreeTextEditor extends AnnotationEditor {
   }
 
   #hasElementChanged(serialized) {
-    const { value, fontSize, color, pageIndex } = this._initialData;
+    const { value, fontSize, color, pageIndex, annotationId } =
+      this._initialData;
 
     return (
       this.hasEditedComment ||
@@ -882,7 +885,8 @@ class FreeTextEditor extends AnnotationEditor {
       serialized.value !== value ||
       serialized.fontSize !== fontSize ||
       serialized.color.some((c, i) => c !== color[i]) ||
-      serialized.pageIndex !== pageIndex
+      serialized.pageIndex !== pageIndex ||
+      serialized.annotationId !== annotationId
     );
   }
 

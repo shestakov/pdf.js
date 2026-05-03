@@ -154,6 +154,7 @@ class SquareEditor extends DrawingEditor {
           contentsObj,
           creationDate,
           modificationDate,
+          annotationId,
         },
         parent: {
           page: { pageNumber },
@@ -175,6 +176,7 @@ class SquareEditor extends DrawingEditor {
         comment: contentsObj?.str || null,
         creationDate,
         modificationDate,
+        annotationId: annotationId ?? null,
       };
     }
 
@@ -286,7 +288,8 @@ class SquareEditor extends DrawingEditor {
     if (!this._initialData) {
       return true;
     }
-    const { color, thickness, opacity, pageIndex } = this._initialData;
+    const { color, thickness, opacity, pageIndex, annotationId } =
+      this._initialData;
     return (
       this.hasEditedComment ||
       this._hasBeenMoved ||
@@ -294,7 +297,8 @@ class SquareEditor extends DrawingEditor {
       serialized.color.some((c, i) => c !== color[i]) ||
       serialized.thickness !== thickness ||
       serialized.opacity !== opacity ||
-      serialized.pageIndex !== pageIndex
+      serialized.pageIndex !== pageIndex ||
+      serialized.annotationId !== annotationId
     );
   }
 

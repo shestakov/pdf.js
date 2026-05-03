@@ -2429,6 +2429,10 @@ class AnnotationEditorUIManager {
       this.#dispatchUpdateStates({
         hasSelectedEditor: this.hasSelection,
       });
+      this._eventBus.dispatch("annotationeditorselected", {
+        source: this,
+        editor: this.hasSelection ? this.firstSelectedEditor : null,
+      });
       return;
     }
     this.#selectedEditors.add(editor);
@@ -2437,6 +2441,10 @@ class AnnotationEditorUIManager {
     this.#dispatchUpdateStates({
       hasSelectedEditor: true,
     });
+    this._eventBus.dispatch("annotationeditorselected", {
+      source: this,
+      editor,
+    });
   }
 
   /**
@@ -2444,6 +2452,7 @@ class AnnotationEditorUIManager {
    * @param {AnnotationEditor} editor
    */
   setSelected(editor) {
+    debugger;
     this.updateToolbar({
       mode: editor.mode,
       editId: editor.uid,
@@ -2463,6 +2472,10 @@ class AnnotationEditorUIManager {
     this.#dispatchUpdateUI(editor.propertiesToUpdate);
     this.#dispatchUpdateStates({
       hasSelectedEditor: true,
+    });
+    this._eventBus.dispatch("annotationeditorselected", {
+      source: this,
+      editor,
     });
   }
 
@@ -2487,6 +2500,10 @@ class AnnotationEditorUIManager {
     this.#selectedEditors.delete(editor);
     this.#dispatchUpdateStates({
       hasSelectedEditor: this.hasSelection,
+    });
+    this._eventBus.dispatch("annotationeditorselected", {
+      source: this,
+      editor: this.hasSelection ? this.firstSelectedEditor : null,
     });
   }
 
@@ -2561,7 +2578,6 @@ class AnnotationEditorUIManager {
    * Delete the current editor or all.
    */
   delete() {
-debugger;
     this.commitOrRemove();
     const drawingEditor = this.currentLayer?.endDrawingSession(
       /* isAborted = */ true
@@ -2658,6 +2674,10 @@ debugger;
     this.#selectedEditors.clear();
     this.#dispatchUpdateStates({
       hasSelectedEditor: false,
+    });
+    this._eventBus.dispatch("annotationeditorselected", {
+      source: this,
+      editor: null,
     });
   }
 

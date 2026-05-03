@@ -897,6 +897,7 @@ class HighlightEditor extends AnnotationEditor {
           contentsObj,
           creationDate,
           modificationDate,
+          annotationId,
         },
         parent: {
           page: { pageNumber },
@@ -919,6 +920,7 @@ class HighlightEditor extends AnnotationEditor {
         comment: contentsObj?.str || null,
         creationDate,
         modificationDate,
+        annotationId: annotationId ?? null,
       };
     } else if (data instanceof InkAnnotationElement) {
       const {
@@ -934,6 +936,7 @@ class HighlightEditor extends AnnotationEditor {
           contentsObj,
           creationDate,
           modificationDate,
+          annotationId,
         },
         parent: {
           page: { pageNumber },
@@ -956,6 +959,7 @@ class HighlightEditor extends AnnotationEditor {
         comment: contentsObj?.str || null,
         creationDate,
         modificationDate,
+        annotationId: annotationId ?? null,
       };
     }
 
@@ -1072,9 +1076,11 @@ class HighlightEditor extends AnnotationEditor {
   }
 
   #hasElementChanged(serialized) {
-    const { color } = this._initialData;
+    const { color, annotationId } = this._initialData;
     return (
-      this.hasEditedComment || serialized.color.some((c, i) => c !== color[i])
+      this.hasEditedComment ||
+      serialized.color.some((c, i) => c !== color[i]) ||
+      serialized.annotationId !== annotationId
     );
   }
 

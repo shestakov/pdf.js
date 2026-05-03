@@ -758,6 +758,7 @@ class StampEditor extends AnnotationEditor {
           contentsObj,
           creationDate,
           modificationDate,
+          annotationId,
         },
         container,
         parent: {
@@ -806,6 +807,7 @@ class StampEditor extends AnnotationEditor {
         comment: contentsObj?.str || null,
         creationDate,
         modificationDate,
+        annotationId: annotationId ?? null,
       };
     }
     const editor = await super.deserialize(data, parent, uiManager);
@@ -919,11 +921,13 @@ class StampEditor extends AnnotationEditor {
   #hasElementChanged(serialized) {
     const {
       pageIndex,
+      annotationId,
       accessibilityData: { altText },
     } = this._initialData;
 
     const isSamePageIndex = serialized.pageIndex === pageIndex;
     const isSameAltText = (serialized.accessibilityData?.alt || "") === altText;
+    const isSameAnnotationId = serialized.annotationId === annotationId;
 
     return {
       isSame:
@@ -931,7 +935,8 @@ class StampEditor extends AnnotationEditor {
         !this._hasBeenMoved &&
         !this._hasBeenResized &&
         isSamePageIndex &&
-        isSameAltText,
+        isSameAltText &&
+        isSameAnnotationId,
       isSameAltText,
     };
   }

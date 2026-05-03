@@ -3,7 +3,7 @@
     "skipDownload": false
   },
   "firefox": {
-    "skipDownload": false,
-    "version": "nightly"
-  }
+    "skipDownload": true
+  },
+  "executablePath": "/usr/bin/firefox"
 }

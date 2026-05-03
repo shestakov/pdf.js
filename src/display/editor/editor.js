@@ -186,6 +186,7 @@ class AnnotationEditor {
     this._initialOptions.isCentered = parameters.isCentered;
     this._structTreeParentId = null;
     this.annotationElementId = parameters.annotationElementId || null;
+    this.annotationId = null;
     this.creationDate = parameters.creationDate || new Date();
     this.modificationDate = parameters.modificationDate || null;
     this.canAddComment = true;
@@ -1851,6 +1852,7 @@ class AnnotationEditor {
       rotation: this.rotation,
       structTreeParentId: this._structTreeParentId,
       popupRef: this._initialData?.popupRef || "",
+      annotationId: this.annotationId,
     };
   }
 
@@ -1873,6 +1875,7 @@ class AnnotationEditor {
       modificationDate: data.modificationDate,
     });
     editor.rotation = data.rotation;
+    editor.annotationId = data.annotationId ?? null;
     editor.#accessibilityData = data.accessibilityData;
     editor._isCopy = data.isCopy || false;
 
@@ -2416,7 +2419,6 @@ class AnnotationEditor {
 
   resetAnnotationElement(annotation) {
     const { firstElementChild } = annotation.container;
-debugger;
     if (
       firstElementChild?.nodeName === "DIV" &&
       firstElementChild.classList.contains("annotationContent")

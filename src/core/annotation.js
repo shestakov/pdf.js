@@ -723,6 +723,7 @@ class Annotation {
       modificationDate: this.modificationDate,
       rect: this.rectangle,
       subtype,
+      annotationId: dict.get("NM") ?? null,
       hasOwnCanvas: false,
       noRotate: !!(this.flags & AnnotationFlag.NOROTATE),
       noHTML: isLocked && isContentLocked,
@@ -4075,6 +4076,7 @@ class FreeTextAnnotation extends MarkupAnnotation {
 
   static createNewDict(annotation, xref, { apRef, ap }) {
     const {
+      annotationId,
       color,
       date,
       fontSize,
@@ -4087,6 +4089,11 @@ class FreeTextAnnotation extends MarkupAnnotation {
     const freetext = oldAnnotation || new Dict(xref);
     freetext.setIfNotExists("Type", Name.get("Annot"));
     freetext.setIfNotExists("Subtype", Name.get("FreeText"));
+    if (annotationId) {
+      freetext.set("NM", annotationId);
+    } else {
+      freetext.delete("NM");
+    }
     freetext.set(
       oldAnnotation ? "M" : "CreationDate",
       `D:${getModificationDate(date)}`
@@ -4370,6 +4377,7 @@ class SquareAnnotation extends MarkupAnnotation {
 
   static createNewDict(annotation, xref, { apRef, ap }) {
     const {
+      annotationId,
       oldAnnotation,
       color,
       date,
@@ -4382,6 +4390,11 @@ class SquareAnnotation extends MarkupAnnotation {
     const sq = oldAnnotation || new Dict(xref);
     sq.setIfNotExists("Type", Name.get("Annot"));
     sq.setIfNotExists("Subtype", Name.get("Square"));
+    if (annotationId) {
+      sq.set("NM", annotationId);
+    } else {
+      sq.delete("NM");
+    }
     sq.set(
       oldAnnotation ? "M" : "CreationDate",
       `D:${getModificationDate(date)}`
@@ -4718,6 +4731,7 @@ class InkAnnotation extends MarkupAnnotation {
 
   static createNewDict(annotation, xref, { apRef, ap }) {
     const {
+      annotationId,
       oldAnnotation,
       color,
       date,
@@ -4732,6 +4746,11 @@ class InkAnnotation extends MarkupAnnotation {
     const ink = oldAnnotation || new Dict(xref);
     ink.setIfNotExists("Type", Name.get("Annot"));
     ink.setIfNotExists("Subtype", Name.get("Ink"));
+    if (annotationId) {
+      ink.set("NM", annotationId);
+    } else {
+      ink.delete("NM");
+    }
     ink.set(
       oldAnnotation ? "M" : "CreationDate",
       `D:${getModificationDate(date)}`
@@ -4962,6 +4981,7 @@ class HighlightAnnotation extends MarkupAnnotation {
 
   static createNewDict(annotation, xref, { apRef, ap }) {
     const {
+      annotationId,
       color,
       date,
       oldAnnotation,
@@ -4974,6 +4994,11 @@ class HighlightAnnotation extends MarkupAnnotation {
     const highlight = oldAnnotation || new Dict(xref);
     highlight.setIfNotExists("Type", Name.get("Annot"));
     highlight.setIfNotExists("Subtype", Name.get("Highlight"));
+    if (annotationId) {
+      highlight.set("NM", annotationId);
+    } else {
+      highlight.delete("NM");
+    }
     highlight.set(
       oldAnnotation ? "M" : "CreationDate",
       `D:${getModificationDate(date)}`
@@ -5283,10 +5308,16 @@ class StampAnnotation extends MarkupAnnotation {
   }
 
   static createNewDict(annotation, xref, { apRef, ap }) {
-    const { date, oldAnnotation, rect, rotation, user } = annotation;
+    const { annotationId, date, oldAnnotation, rect, rotation, user } =
+      annotation;
     const stamp = oldAnnotation || new Dict(xref);
     stamp.setIfNotExists("Type", Name.get("Annot"));
     stamp.setIfNotExists("Subtype", Name.get("Stamp"));
+    if (annotationId) {
+      stamp.set("NM", annotationId);
+    } else {
+      stamp.delete("NM");
+    }
     stamp.set(
       oldAnnotation ? "M" : "CreationDate",
       `D:${getModificationDate(date)}`

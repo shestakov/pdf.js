@@ -582,7 +582,6 @@ class AnnotationEditorLayer {
    * @param {AnnotationEditor} editor
    */
   add(editor) {
-    debugger;
     if (editor.parent === this && editor.isAttachedToDOM) {
       return;
     }
@@ -841,7 +840,6 @@ class AnnotationEditorLayer {
     this.#hadPointerDown = false;
 
     if (this.#currentEditorType?.isDrawer) {
-      debugger;
       return;
     }
 
