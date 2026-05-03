@@ -14,6 +14,7 @@
  */
 
 import {
+  applyFunctionToEditor,
   awaitPromise,
   closePages,
   getFirstSerialized,
@@ -83,6 +84,48 @@ describe("Box Editor", () => {
           expect(svgStrokeWidth)
             .withContext(`In ${browserName}`)
             .toBeCloseTo(serializedThickness * realScale, 1);
+        })
+      );
+    });
+  });
+
+  describe("annotationId round-trip", () => {
+    let pages;
+
+    beforeEach(async () => {
+      pages = await loadAndWait("empty.pdf", ".annotationEditorLayer");
+    });
+
+    afterEach(async () => {
+      await closePages(pages);
+    });
+
+    it("must persist annotationId set on the editor into serialized output", async () => {
+      await Promise.all(
+        pages.map(async ([browserName, page]) => {
+          await switchToBox(page);
+
+          const rect = await page.$eval(".annotationEditorLayer", el =>
+            el.getBoundingClientRect().toJSON()
+          );
+
+          const x0 = rect.x + 50;
+          const y0 = rect.y + 50;
+          await drawBox(page, x0, y0, x0 + 100, y0 + 60);
+          await waitForSerialized(page, 1);
+
+          await applyFunctionToEditor(
+            page,
+            "pdfjs_internal_editor_0",
+            editor => {
+              editor.annotationId = "test-id";
+            }
+          );
+
+          const { annotationId } = await getFirstSerialized(page);
+          expect(annotationId)
+            .withContext(`In ${browserName}`)
+            .toEqual("test-id");
         })
       );
     });

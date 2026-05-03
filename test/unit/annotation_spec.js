@@ -4803,6 +4803,107 @@ describe("annotation", function () {
           "endobj\n"
       );
     });
+
+    it("should read annotationId from /NM key", async function () {
+      const squareDict = new Dict();
+      squareDict.set("Type", Name.get("Annot"));
+      squareDict.set("Subtype", Name.get("Square"));
+      squareDict.set("Rect", [10, 20, 110, 120]);
+      squareDict.set("NM", "test-id");
+
+      const squareRef = Ref.get(181, 0);
+      const xref = new XRefMock([{ ref: squareRef, data: squareDict }]);
+
+      const { data } = await AnnotationFactory.create(
+        xref,
+        squareRef,
+        annotationGlobalsMock,
+        idFactoryMock
+      );
+      expect(data.annotationId).toEqual("test-id");
+    });
+
+    it("should set annotationId to null when /NM is absent", async function () {
+      const squareDict = new Dict();
+      squareDict.set("Type", Name.get("Annot"));
+      squareDict.set("Subtype", Name.get("Square"));
+      squareDict.set("Rect", [10, 20, 110, 120]);
+
+      const squareRef = Ref.get(182, 0);
+      const xref = new XRefMock([{ ref: squareRef, data: squareDict }]);
+
+      const { data } = await AnnotationFactory.create(
+        xref,
+        squareRef,
+        annotationGlobalsMock,
+        idFactoryMock
+      );
+      expect(data.annotationId).toBeNull();
+    });
+
+    it("should write annotationId as /NM when saving", async function () {
+      const xref = (partialEvaluator.xref = new XRefMock());
+      const changes = new RefSetCache();
+      const task = new WorkerTask("test Square NM write");
+      await AnnotationFactory.saveNewAnnotations(
+        partialEvaluator,
+        xref,
+        task,
+        [
+          {
+            annotationType: AnnotationEditorType.SQUARE,
+            rect: [12, 34, 56, 78],
+            rotation: 0,
+            thickness: 2,
+            opacity: 1,
+            color: [255, 0, 0],
+            annotationId: "ext-uuid-1",
+          },
+        ],
+        null,
+        changes
+      );
+      const data = await writeChanges(changes, xref);
+      expect(data[0].data).toContain("/NM (ext-uuid-1)");
+    });
+
+    it("should remove /NM when annotationId is null on update", async function () {
+      const squareDict = new Dict();
+      squareDict.set("Type", Name.get("Annot"));
+      squareDict.set("Subtype", Name.get("Square"));
+      squareDict.set("Rect", [12, 34, 56, 78]);
+      squareDict.set("NM", "old-uuid");
+
+      const squareRef = Ref.get(183, 0);
+      const xref = (partialEvaluator.xref = new XRefMock([
+        { ref: squareRef, data: squareDict },
+      ]));
+      const changes = new RefSetCache();
+      const task = new WorkerTask("test Square NM removal");
+      await AnnotationFactory.saveNewAnnotations(
+        partialEvaluator,
+        xref,
+        task,
+        [
+          {
+            annotationType: AnnotationEditorType.SQUARE,
+            rect: [12, 34, 56, 78],
+            rotation: 0,
+            thickness: 2,
+            opacity: 1,
+            color: [255, 0, 0],
+            annotationId: null,
+            id: "183R",
+            ref: squareRef,
+            oldAnnotation: squareDict,
+          },
+        ],
+        null,
+        changes
+      );
+      const data = await writeChanges(changes, xref);
+      expect(data.some(d => d.data.includes("/NM"))).toBeFalse();
+    });
   });
 
   describe("HighlightAnnotation", function () {

@@ -17,11 +17,22 @@ npm publish          # From build/dist/ — publishes to the private registry
 
 The `publishConfig.registry` is set to `https://npm.hardroller.ru` in `gulpfile.mjs`. The package name is set via `DIST_NAME = "@hardroller/pdfjs-dist"`.
 
-### Running a Single Unit Test
+### Node.js Version
+
+The repo has a `.nvmrc` pinning the required Node.js version. Always activate it before running any build or test command, otherwise `gulpfile.mjs` will fail (it uses `import.meta.dirname` which requires Node ≥ 21):
 
 ```bash
-# Pass a grep pattern to Jasmine
-npx jasmine --filter="<test name pattern>" test/unit/<file>_spec.js
+nvm use   # activate the version from .nvmrc
+```
+
+### Running a Single Unit Test
+
+Build the `lib-legacy` target first (required by the Jasmine CLI config), then filter by name:
+
+```bash
+nvm use
+npx gulp lib-legacy
+node node_modules/jasmine/bin/jasmine JASMINE_CONFIG_PATH=test/unit/clitests.json --filter="<test name pattern>"
 ```
 
 ### Fork-Specific Features
