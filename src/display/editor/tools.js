@@ -2452,7 +2452,6 @@ class AnnotationEditorUIManager {
    * @param {AnnotationEditor} editor
    */
   setSelected(editor) {
-    debugger;
     this.updateToolbar({
       mode: editor.mode,
       editId: editor.uid,
