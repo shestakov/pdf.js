@@ -166,23 +166,6 @@ pdfjs-printing-not-ready = Внимание: Този PDF файл не е на�
 
 ## Tooltips and alt text for side panel toolbar buttons
 
-pdfjs-toggle-sidebar-button =
-    .title = Превключване на страничната лента
-pdfjs-toggle-sidebar-notification-button =
-    .title = Превключване на страничната лента (документът има структура/прикачени файлове/слоеве)
-pdfjs-toggle-sidebar-button-label = Превключване на страничната лента
-pdfjs-document-outline-button =
-    .title = Показване на структурата на документа (двукратно щракване за свиване/разгъване на всичко)
-pdfjs-document-outline-button-label = Структура на документа
-pdfjs-attachments-button =
-    .title = Показване на притурките
-pdfjs-attachments-button-label = Притурки
-pdfjs-layers-button =
-    .title = Показване на слоевете (двукратно щракване за възстановяване на всички слоеве към състоянието по подразбиране)
-pdfjs-layers-button-label = Слоеве
-pdfjs-thumbs-button =
-    .title = Показване на миниатюрите
-pdfjs-thumbs-button-label = Миниатюри
 pdfjs-current-outline-item-button =
     .title = Намиране на текущия елемент от структурата
 pdfjs-current-outline-item-button-label = Текущ елемент от структурата
@@ -195,18 +178,14 @@ pdfjs-additional-layers = Допълнителни слоеве
 
 # Variables:
 #   $page (Number) - the page number
-pdfjs-thumb-page-title =
-    .title = Страница { $page }
-# Variables:
-#   $page (Number) - the page number
 pdfjs-thumb-page-canvas =
     .aria-label = Миниатюра на страница { $page }
 
 ## Find panel button title and messages
 
 pdfjs-find-input =
-    .title = Търсене
     .placeholder = Търсене в документа…
+    .title = Търсене
 pdfjs-find-previous-button =
     .title = Намиране на предишно съвпадение на фразата
 pdfjs-find-previous-button-label = Предишна
@@ -291,7 +270,7 @@ pdfjs-editor-ink-button =
     .title = Рисуване
 pdfjs-editor-ink-button-label = Рисуване
 pdfjs-editor-stamp-button =
-    .title = Добавяне или променяне на изображения
+    .title = Добавяне или редактиране на изображения
 pdfjs-editor-stamp-button-label = Добавяне или променяне на изображения
 
 ## Remove button for the various kind of editor.
@@ -385,4 +364,52 @@ pdfjs-editor-new-alt-text-not-now-button = Не сега
 
 ## Image alt-text settings
 
-pdfjs-editor-alt-text-settings-delete-model-button = Изтриване
+pdfjs-editor-alt-text-settings-show-dialog-button-label = Показване на заместващ текстов редактор веднага при добавяне на изображение
+
+## Controls
+
+pdfjs-editor-add-signature-image-upload-error-description = Проверете мрежовата си връзка или опитайте с друго изображение.
+
+## The view manager is a sidebar displaying different views:
+##  - thumbnails;
+##  - outline;
+##  - attachments;
+##  - layers.
+## The thumbnails view is used to edit the pdf: remove/insert pages, ...
+
+pdfjs-toggle-views-manager-button1-label = Управление на страници
+pdfjs-views-manager-pages-title = Страници
+pdfjs-views-manager-pages-option-label = Страници
+# Variables:
+#   $count (Number) - the number of selected pages.
+pdfjs-views-manager-pages-status-action-label =
+    { $count ->
+        [one] { $count } избрана
+       *[other] { $count } избрани
+    }
+pdfjs-views-manager-pages-status-action-button-label = Управление
+# Variables:
+#   $count (Number) - the number of selected pages to be copied.
+pdfjs-views-manager-pages-status-undo-copy-label =
+    { $count ->
+        [one] 1 страница е копирана
+       *[other] { $count } страници са копирани
+    }
+# Variables:
+#   $count (Number) - the number of selected pages to be deleted.
+pdfjs-views-manager-pages-status-undo-delete-label =
+    { $count ->
+        [one] 1 страница е изтрита
+       *[other] { $count } страници са изтрити
+    }
+pdfjs-toggle-views-manager-button1 =
+    .title = Управление на страници
+
+## Per-signature certificate row. The variants with an issuer / date in
+## parentheses embed fully-localized context — no English fall-through.
+##
+## Variables:
+##   $issuer (String) - issuer or subject common name from the cert.
+##   $dateObj (Date)  - notAfter date for the expired-with-date form.
+
+pdfjs-digital-signature-properties-certificate-expired = Сертификат: с изтекъл срок на валидност
